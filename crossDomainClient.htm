@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Json Proxy Client</title>
+    <!-- For Jquery Parsing -->
+<script type="text/javascript" src="js/jquery-1.5.min.js"></script>
+
+<!-- This script writes Dynamic Script Tags. It finally returns control to the function named "parseData" -->
+<script type="text/javascript" src="js/jsr_class.js"></script>
+<script type="text/javascript">
+//The response JSON object is returned into this variable
+var jsonData=null;
+</script>
+</head>
+<body>
+
+
+<script type="text/javascript">
+
+
+/* The web service location. Please do not forget to update the location of jsonprxy.aspx to your server. */
+var serviceReq  = 'http://localhost:2853/jsonproxy/jsonprxy.aspx';
+						
+function performSearch(btn)
+{
+var strInput="";
+var strSearchType=$('#ddnSearchType').val();
+strInput = strInput +"?q="+strSearchType;
+
+//Setting the "searching...." progress label & button invisible until processing
+$('span#lblSearchProgress1').css('display','block');
+$('input#btnSearch1').css('display','none');
+
+ 
+// Create a new request object
+bObj = new JSONscriptRequest(serviceReq+strInput); 
+// Build the dynamic script tag
+bObj.buildScriptTag(); 
+// Add the script tag to the page
+bObj.addScriptTag();
+//Adding script tag loads the data.  On load of the script, the function parseData is triggerred.
+
+bObj.removeScriptTag(); 
+}
+
+
+function parseData(data) {
+$("table#tblInfo tbody tr").remove();
+parseJson(data);
+$('span#lblSearchProgress1').css('display','none');
+$('input#btnSearch1').css('display','block');
+}
+
+function parseJson(data) {
+$.each(data, function(i, publication) {
+$("table#tblInfo tbody").append("<tr>" + "<td>" + publication.Author + "</td>" + "<td>" + publication.Title+ "</td>" +"<td>" + publication.Remarks + "</td>" +"<td>" +publication.Category  + "</td>" +"<td>" + publication.Link + "</td>" + "</tr>");
+});	
+}
+
+//One of the utility function to traverse Json. Not used here.
+function js_traverse(o) {
+    var type = typeof o 
+    if (type == "object") {
+        for (var key in o) {
+		$("div#divInfo").append("key: ", key);
+            js_traverse(o[key])
+        }
+    } else {
+        $("div#divInfo").append(o)
+    }
+}
+</script>
+
+<table cellpadding="0" cellspacing="0">
+    <tr><th>
+        Filter:-</th>
+    <td><select name="ddnSearchType" id="ddnSearchType">
+	<option value="">&lt;please select&gt;</option>
+	<option value="even">Even</option>
+	<option value="odd">Odd</option> 
+</select></td></tr>
+<tr>
+<td>Search: </td>
+<td>
+<table  cellpadding="0" cellspacing="0"><tr>
+				<td><span id="lblSearchProgress1" style="display:none">Searching.....</span></td>
+				<td> <input type="button" value="Search" name="nSearch" id="btnSearch1" onclick="javascript:performSearch(this)"/></td>
+				</tr></table>
+</td>
+</table>
+<div id="divInfo"></div>
+<table  border="1"  cellpadding="0" cellspacing="0" id="tblInfo">
+              <thead>
+                <tr>
+                <th><b>ID</b></th>
+                  <th><b>Author</b></th>
+                  <th ><b>Title</b></th>
+                  <th ><b>Remarks</b></th>
+                  <th ><b>Category</b></th>
+                </tr>
+              </thead>
+              <tbody>
+<!-- English Language -->
+
+
+              </tbody>
+              </table>
+</body>
+</html>
